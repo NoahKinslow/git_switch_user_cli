@@ -4,6 +4,8 @@ I often use multiple git accounts for different repos, I find it tedious to cont
 
 showcase:
 
+![showcase](https://user-images.githubusercontent.com/39603201/149581571-6e58eff0-b168-4902-87a0-cdfa96995583.png)
+
 
 Requires that you have installed gh (github-cli).
 This uses a --global change to the config so that you don't have to worry about individual projects.

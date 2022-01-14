@@ -4,6 +4,7 @@ use std::process::Command;
 fn main() {
     let name = input_user();
     modify_git_config_user(&name);
+    request_auth();
 }
 
 fn input_user() -> String {
@@ -19,7 +20,7 @@ fn input_user() -> String {
 fn modify_git_config_user(username: &String) {
     let change_username_command = Command::new("git")
         .args(["config", "--global", "user.name", username])
-        .output() // execute command
+        .output()
         .expect("process to change user.name failed");
 
     if change_username_command.status.success() {
@@ -30,7 +31,7 @@ fn modify_git_config_user(username: &String) {
 
     let change_credential_command = Command::new("git")
         .args(["config", "--global", "credential.username", username])
-        .output() // execute command
+        .output()
         .expect("process to change credential.username failed");
 
     if change_credential_command.status.success() {
@@ -38,4 +39,14 @@ fn modify_git_config_user(username: &String) {
     } else {
         println!("result: {}", change_credential_command.status);
     }
+}
+
+fn request_auth() {
+    println!("You will now be asked to authenticate using gh");
+
+    // execute command without capturing output of gh so that code is visible
+    let _authenticate_command = Command::new("gh")
+        .args(["auth", "login", "-w"])
+        .spawn()
+        .expect("process to authenticate failed");
 }

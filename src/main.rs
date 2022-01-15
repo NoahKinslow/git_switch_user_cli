@@ -40,17 +40,17 @@ fn modify_git_config_user(username: &String) {
         println!("result: {}", change_credential_command.status);
     }
 
-    let mut username_email: String = String::new();
-    username_email.push_str(username);
-    username_email.push_str("@users.noreply.github.com");
+    let (user_id, username) = request_get_user_id(username);
+
+    let username_email = format!("{}+{}@users.noreply.github.com", user_id, username);
 
     let change_email_command = Command::new("git")
         .args(["config", "--global", "user.email", &username_email])
         .output()
-        .expect("process to change user.name failed");
+        .expect("process to change user.email failed");
 
     if change_email_command.status.success() {
-        println!("process to change user.name success");
+        println!("process to change user.email success");
     } else {
         println!("result: {}", change_email_command.status);
     }
@@ -64,4 +64,29 @@ fn request_auth() {
         .args(["auth", "login", "-w"])
         .spawn()
         .expect("process to authenticate failed");
+}
+
+// return (username, user_id)
+fn request_get_user_id(username: &String) -> (String, String) {
+    let temp_username = String::from(username);
+
+    let api_path = format!("https://api.github.com/users/{}", username);
+
+    println!("api path: {}", api_path);
+
+    let change_email_command = Command::new("gh")
+        //.args(["api", api_path.as_str(), "--jq", "'.id'"])
+        .args(["api", api_path.as_str(), "--jq", ".id"])
+        .output()
+        .expect("process to fetch email from git api failed");
+
+    let user_id = String::from(
+        String::from_utf8(change_email_command.stdout)
+            .unwrap()
+            .trim(),
+    );
+
+    println!("user_id: {}", user_id);
+
+    (temp_username, user_id)
 }

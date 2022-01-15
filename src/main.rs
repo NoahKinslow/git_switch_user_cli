@@ -18,41 +18,27 @@ fn input_user() -> String {
 }
 
 fn modify_git_config_user(username: &String) {
-    let change_username_command = Command::new("git")
-        .args(["config", "--global", "user.name", username])
-        .output()
-        .expect("process to change user.name failed");
+    execute_git_config_command(&String::from("user.name"), username);
 
-    if change_username_command.status.success() {
-        println!("process to change user.name success");
-    } else {
-        println!("result: {}", change_username_command.status);
-    }
-
-    let change_credential_command = Command::new("git")
-        .args(["config", "--global", "credential.username", username])
-        .output()
-        .expect("process to change credential.username failed");
-
-    if change_credential_command.status.success() {
-        println!("process to change credential.username success");
-    } else {
-        println!("result: {}", change_credential_command.status);
-    }
+    execute_git_config_command(&String::from("credential.username"), username);
 
     let (user_id, username) = request_get_user_id(username);
 
     let username_email = format!("{}+{}@users.noreply.github.com", user_id, username);
 
-    let change_email_command = Command::new("git")
-        .args(["config", "--global", "user.email", &username_email])
-        .output()
-        .expect("process to change user.email failed");
+    execute_git_config_command(&String::from("user.email"), &username_email);
+}
 
-    if change_email_command.status.success() {
-        println!("process to change user.email success");
+fn execute_git_config_command(field_name: &String, field: &String) {
+    let change_field_command = Command::new("git")
+        .args(["config", "--global", &field_name, &field])
+        .output()
+        .expect(format!("process to change {} failed", &field_name).as_str());
+
+    if change_field_command.status.success() {
+        println!("process to change {} success", &field_name);
     } else {
-        println!("result: {}", change_email_command.status);
+        println!("result: {}", change_field_command.status);
     }
 }
 
